@@ -35,3 +35,7 @@ func (s Status) IsValid() bool {
 		return false
 	}
 }
+
+func (s Status) IsActive() bool {
+	return s.value == active
+}

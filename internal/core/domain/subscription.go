@@ -62,3 +62,17 @@ func (s *Subscription) Renew(months int, now time.Time) {
 	s.period = subPeriod
 
 }
+
+// demeeli burada bele bir method domaine  elave edirem sebeb odur ki bizim servisimze data nece sualinin sizmasinin qarsini aliriq
+// ve men   bunu  biznese  yegane giris qapisi olan agregate roota verecemki o idare etsin amma davranis eele statusn oz icndede olsun
+// oz mesuliyyetini ozu  idare etsin
+//  now  kimi time colden verirem sebeb odur ki  bu test zamani mene problem yaratmayacaq
+// umumiyetle domain   icersinde bir datanin   indiki veziyyetini saxlamasi  duzgun deyil o data ile ne edeceyine qerar vermeldir datani
+// colden almalidir  bura   atomun icidir sehv bir  davranis bizi partlada biler !
+func (s *Subscription) IsActive(now time.Time) bool {
+
+	if s.status.IsActive() && !s.period.IsActive(now) {
+		return true
+	}
+	return false
+}
