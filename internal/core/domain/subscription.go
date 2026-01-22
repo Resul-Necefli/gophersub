@@ -76,3 +76,12 @@ func (s *Subscription) IsActive(now time.Time) bool {
 	}
 	return false
 }
+
+//  burada  getter metodlar elave edirem ki  repository  ve ya servis terefinden  bu datalara
+func (s *Subscription) GetByUserID() string {
+	return s.userID
+}
+
+func (s *Subscription) GetByID() string {
+	return s.id
+}
