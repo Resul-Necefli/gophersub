@@ -18,11 +18,11 @@ func NewPeriod(start, end time.Time) (SubscriptionPeriod, error) {
 
 	if end.Before(start) {
 
-		return SubscriptionPeriod{}, errors.New("end date cannot be before start date")
+		return SubscriptionPeriod{}, errors.New("invalid subscription period: end date cannot be before start date")
 	}
 
 	if start.After(time.Now()) {
-		return SubscriptionPeriod{}, errors.New("balsangic tarixi kecmis ola bilmez")
+		return SubscriptionPeriod{}, errors.New("start date cannot be in the future")
 	}
 
 	return SubscriptionPeriod{
@@ -54,5 +54,10 @@ func (s SubscriptionPeriod) Extend(months int, now time.Time) SubscriptionPeriod
 		s.end = now.AddDate(0, months, 0)
 	}
 
-	return s
+	// return s
+	return SubscriptionPeriod{
+		start: s.start,
+		end:   s.end,
+	}
+
 }

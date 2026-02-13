@@ -18,14 +18,19 @@ type SubscriptionRepository interface {
 	Save(sub *domain.Subscription) error
 	GetByID(id string) (*domain.Subscription, error)
 	GetByUserID(userID string) ([]*domain.Subscription, error)
+	GetPlanByName(name string) (*domain.Plan, error)
 }
 
-// - `SubscriptionRepository` adlı bir `interface` yarat.
+// GetPlanByName(name string) (*domain.Plan, error)
 
-//     - Metodlar:
+// bu metodun  sebebi odurki  biz  abunelik ucun  planlarimiz var ve biz istfadeciye  plan adina gore  abunelik yaratmaq isteyirik
+// men  bunu sonradan elave etdim  normalda heqiqi projecte hersey qabaxcadan cox cidi sekilde planlanmalidir  amma biz  bu projece
+// faza faza  irlesdiririk ve bu metodun  elave edilmesi  bizim  planlarimiz ucun  repository de  bir metodun  elave edilmesi  lazim idi
+//  cunki biz  plan adina gore  abunelik yaratmaq isteyirik ve bu metod bize  plan adina gore  plan obyektini qaytaracaq ki bizde o obyektin
+//  icinde olan deyerlerden istfade ederek  abunelik yarada bilik
 
-//         - `Create(sub *domain.Subscription) error`
+//  bu sekildede ayira bilerdim amma  helelik ayrmiram ve   SOLID  I sini pozuram bilerekden
 
-//         - `GetByID(id string) (*domain.Subscription, error)`
-
-//         - `Update(sub *domain.Subscription) error`
+// type Subscribe interface {
+// 	Subscribe(userID, planName string, amount int64, currency string) error
+// }

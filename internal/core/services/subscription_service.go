@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -18,6 +19,12 @@ func NewSubscriptionService(r ports.SubscriptionRepository) *SubscriptionService
 	return &SubscriptionService{repo: r}
 }
 
+// Subscribe methodu  istfadeci ucun yeni  abunelik yaradir
+//  burada  yoxlayirki  istfadeci  hal hazirda  aktiv  abuneliyye sahibdirmi
+//  eger aktiv abuneliyi yoxdursa  yeni  abunelik yaradir
+//  burada  domain obyektleri ve value object lerden istfade edirik
+//  servis  biznes mentiqini  ozunde saxlayir
+//  ve repository  ile  datanin  saxlanmasini  temin edir
 func (s SubscriptionService) Subscribe(userID, planName string, amount int64, currency string) error {
 
 	// birinci yoxlamaq ucun men  aggregate root  idare etdyi VO lardan  birine muraciet edecem bu
@@ -37,7 +44,7 @@ func (s SubscriptionService) Subscribe(userID, planName string, amount int64, cu
 	now := time.Now()
 	for _, sub := range subs {
 		if sub.IsActive(now) {
-			return nil
+			return errors.New("activ abunelik yoxdur")
 		}
 	}
 
