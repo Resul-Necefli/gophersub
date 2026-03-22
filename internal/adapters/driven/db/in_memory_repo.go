@@ -38,7 +38,7 @@ func (i *InMemorySubscriptionRepository) Save(sub *domain.Subscription) error {
 	//  sync.mutex elave etdim  burada  yazma emeliyatlari ustunluk  ve ya beraberlik teskil etdiyi ucun men burada  herhasnsi
 	//bir  sync.Map  istfade etmedim    mutex ile map  birlesdirdim   cunki sync map icerisinde ikdene map saxlayir ve buradaki
 	// veziyyetde o menim ucun performansima   ziddir
-	id := sub.GetByID()
+	id := sub.ID()
 	i.mutex.Lock()
 	i.memory[id] = sub
 	i.mutex.Unlock()
@@ -68,7 +68,7 @@ func (i *InMemorySubscriptionRepository) GetByUserID(userID string) ([]*domain.S
 	defer i.mutex.RUnlock()
 	var result = make([]*domain.Subscription, 0, 10)
 	for _, sub := range i.memory {
-		if sub.GetByUserID() == userID {
+		if sub.UserID() == userID {
 			result = append(result, sub)
 		}
 	}

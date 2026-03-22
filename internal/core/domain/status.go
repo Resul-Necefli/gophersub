@@ -20,7 +20,7 @@ func NewStatus(v string) (Status, error) {
 
 	status := Status{value: v}
 	if !status.IsValid() {
-		return Status{}, errors.New("invalid status!")
+		return Status{}, errors.New("invalid status value")
 	}
 
 	return status, nil

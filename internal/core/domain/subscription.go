@@ -78,10 +78,41 @@ func (s *Subscription) IsActive(now time.Time) bool {
 }
 
 //  burada  getter metodlar elave edirem ki  repository  ve ya servis terefinden  bu datalara
-func (s *Subscription) GetByUserID() string {
+func (s *Subscription) UserID() string {
 	return s.userID
 }
 
-func (s *Subscription) GetByID() string {
+func (s *Subscription) ID() string {
 	return s.id
 }
+
+func (s *Subscription) PlanName() string {
+	return s.planName
+}
+
+func (s *Subscription) PeriodStart() time.Time {
+	return s.period.start
+}
+
+func (s *Subscription) PeriodEnd() time.Time {
+	return s.period.end
+}
+
+func (s *Subscription) PriceAmount() int64 {
+
+	return s.price.amount
+}
+
+func (s *Subscription) PriceCurrency() string {
+
+	return s.price.currency
+}
+
+// sub.ID(),                  // $1: Abunəliyin unikal ID-si++++++++++++++
+// 	sub.UserID(),              // $2: İstifadəçinin ID-si +++++++++++++++++++++++
+// 	sub.PlanName(),            // $3: "premium" və ya "basic"++++++++++++++++++++++++++++++++
+// 	sub.Period().Start,        // $4: Başlanğıc tarixi (Period VO-dan gəlir)
+// 	sub.Period().End,          // $5: Bitiş tarixi (Period VO-dan gəlir)
+// 	sub.Price().Amount,        // $6: Məbləğ (Money VO-dan gəlir)
+// 	sub.Price().Currency,      // $7: Valyuta (Money VO-dan gəlir)
+// 	sub.Status(),

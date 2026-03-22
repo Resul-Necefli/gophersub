@@ -6,5 +6,5 @@ package domain
 type Plan struct {
 	Name     string
 	Price    Money
-	Duration SubscriptionPeriod
+	Duration int
 }
