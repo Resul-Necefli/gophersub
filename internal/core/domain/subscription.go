@@ -33,6 +33,19 @@ func NewSubscription(id, userID, planName string, price Money, period Subscripti
 	}, nil
 }
 
+// RestoreSubscription - Verilənlər bazasından gələn məlumatları obyektə çevirmək üçündür.
+// Burada heç bir yeni ID generasiyası və ya status dəyişikliyi edilmir.
+func RestoreSubscription(id, userID, planName string, period SubscriptionPeriod, price Money, status Status) *Subscription {
+	return &Subscription{
+		id:       id,
+		userID:   userID,
+		planName: planName,
+		period:   period,
+		price:    price,
+		status:   status,
+	}
+}
+
 // IsExpired checks if the subscription has expired based on the current time.
 func (s *Subscription) IsExpired(now time.Time) bool {
 

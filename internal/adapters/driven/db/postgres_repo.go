@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	// Postgres driver-ini yükləyirik
 	_ "github.com/lib/pq"
@@ -117,9 +118,104 @@ func (p *PostgresRepository) Save(sub *domain.Subscription) error {
 }
 
 func (p *PostgresRepository) GetByID(id string) (*domain.Subscription, error) {
-	return nil, nil
+
+	query := `
+		SELECT id, user_id, plan_name, start_date, end_date, price_amount, price_currency, status
+		FROM subscriptions
+		WHERE id = $1
+	`
+
+	var dbID string
+	var userID string
+	var planName string
+	var startDate time.Time
+	var endDate time.Time
+	var priceAmount int64
+	var priceCurrency string
+	var status string
+
+	err := p.db.QueryRow(query, id).Scan(
+		&dbID, &userID, &planName, &startDate, &endDate, &priceAmount, &priceCurrency, &status,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("subscription not found")
+		}
+		return nil, fmt.Errorf("database error: %w", err)
+	}
+
+	moneyVO, err := domain.NewMoney(priceAmount, priceCurrency)
+	if err != nil {
+		return nil, fmt.Errorf("invalid money data in db: %w", err)
+	}
+
+	periodVO, err := domain.NewPeriod(startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("invalid period data in db: %w", err)
+	}
+
+	domainStatus, err := domain.NewStatus(status)
+	if err != nil {
+		return nil, fmt.Errorf("invalid status data in db: %w", err)
+	}
+
+	sub := domain.RestoreSubscription(dbID, userID, planName, periodVO, moneyVO, domainStatus)
+
+	return sub, nil
 }
 
 func (p *PostgresRepository) GetByUserID(userID string) ([]*domain.Subscription, error) {
-	return nil, nil
+	query := `
+		SELECT id, user_id, plan_name, start_date, end_date, price_amount, price_currency, status
+		FROM subscriptions
+		WHERE user_id = $1
+		ORDER BY start_date DESC
+	`
+
+	rows, err := p.db.Query(query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query user subscriptions: %w", err)
+	}
+
+	defer rows.Close()
+
+	var subscriptions []*domain.Subscription
+
+	for rows.Next() {
+		var dbID, dbUserID, planName, priceCurrency, statusStr string
+		var priceAmount int64
+		var startDate, endDate time.Time
+
+		err := rows.Scan(
+			&dbID, &dbUserID, &planName, &startDate, &endDate, &priceAmount, &priceCurrency, &statusStr,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan subscription row: %w", err)
+		}
+
+		moneyVO, err := domain.NewMoney(priceAmount, priceCurrency)
+		if err != nil {
+			return nil, fmt.Errorf("invalid money data in db: %w", err)
+		}
+
+		periodVO, err := domain.NewPeriod(startDate, endDate)
+		if err != nil {
+			return nil, fmt.Errorf("invalid period data in db: %w", err)
+		}
+
+		domainStatus, err := domain.NewStatus(statusStr)
+		if err != nil {
+			return nil, fmt.Errorf("invalid status data in db: %w", err)
+		}
+
+		sub := domain.RestoreSubscription(dbID, dbUserID, planName, periodVO, moneyVO, domainStatus)
+		subscriptions = append(subscriptions, sub)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows iteration error: %w", err)
+	}
+
+	return subscriptions, nil
 }
